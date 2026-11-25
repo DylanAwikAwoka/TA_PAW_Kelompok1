@@ -9,6 +9,7 @@
     <thead class="table-light">
         <tr>
             <th>No</th>
+            <th>Kode Pesanan</th>
             <th>Tanggal</th>
             <th>Pemesan</th>
             <th>Konser</th>
@@ -23,6 +24,7 @@
         @forelse ($daftarPesanan as $pesanan)
             <tr>
                 <td>{{ $loop->iteration }}</td>
+                <td><code>{{ $pesanan->kode_pesanan }}</code></td>
                 <td>{{ $pesanan->created_at->format('d-m-Y H:i') }}</td>
                 <td>{{ $pesanan->nama_pemesan }}<br>
                     <small class="text-muted">{{ $pesanan->email }}</small></td>
@@ -57,7 +59,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="9" class="text-center">Belum ada pesanan.</td>
+                <td colspan="10" class="text-center">Belum ada pesanan.</td>
             </tr>
         @endforelse
     </tbody>

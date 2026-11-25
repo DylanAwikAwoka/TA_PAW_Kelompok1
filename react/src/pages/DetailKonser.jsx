@@ -108,7 +108,8 @@ export default function DetailKonser() {
 
                 {pesanSukses && (
                     <p className="state state-sukses">
-                        Pesanan #{pesanSukses.id} berhasil dibuat. Jenis: {pesanSukses.jenis_tiket || '-'}.
+                        Pesanan berhasil dibuat. Kode pesanan: <strong>{pesanSukses.kode_pesanan}</strong>.
+                        Simpan kode ini untuk mengecek status. Jenis: {pesanSukses.jenis_tiket || '-'}.
                         Status: {pesanSukses.status}, total {rupiah(pesanSukses.total)}.
                     </p>
                 )}

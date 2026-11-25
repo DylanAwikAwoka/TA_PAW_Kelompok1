@@ -27,7 +27,7 @@ memakai API Laravel.
 |---|---|---|---|
 | A | Kategori Tiket (VIP/Reguler, harga & stok per jenis) | Selesai | [ISI] |
 | I | Pembatasan Pembelian per pesanan | Selesai | [ISI] |
-| G | Riwayat Pesanan lewat kode pesanan | Belum | [ISI] |
+| G | Riwayat Pesanan lewat kode pesanan | Selesai | [ISI] |
 | J | Log Aktivitas Admin | Belum (menunggu kepastian dosen) | [ISI] |
 
 ## Kebijakan Kelompok
@@ -39,7 +39,7 @@ Keputusan yang diambil kelompok dan berlaku di aplikasi:
 | Batas pembelian per pesanan | 5 tiket | Diatur di `config/tiketwar.php` dan dipakai bersama oleh web dan API. |
 | Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. |
 | Stok konser | Total dari semua jenis | Kolom `sisa` pada konser hanya cerminan. Stok sebenarnya ada di masing-masing jenis tiket. |
-| Kode pesanan | 12 karakter acak | Diterapkan pada Fitur G; dipakai pelanggan untuk mengecek status pesanan. |
+| Kode pesanan | 12 karakter acak huruf besar/angka | Dibuat otomatis saat pesanan dibuat, unik, dan dipakai untuk mengecek status. |
 
 Nilai di atas adalah rancangan yang disepakati kelompok. Setiap baris diperbarui saat fitur terkait
 selesai dikerjakan.
@@ -81,6 +81,21 @@ Cara mencoba:
 2. Kirim `POST /api/konser/1/pesanan` dengan `jumlah: 6` → respons 422 berisi pesan yang sama.
 3. Di React, kirim `jumlah: 6` pada detail konser → pesan validasi tampil di halaman.
 4. `php artisan test` → 14 test lulus, termasuk uji batas web, API, dan perubahan nilai di config.
+
+## Fitur G — Riwayat Pesanan
+
+Setiap pesanan mendapat kode 12 karakter (huruf besar dan angka) secara otomatis. Kode tampil pada
+pesan sukses React dan kolom **Kode Pesanan** di halaman admin `/pesanan`. Data pesanan lama
+mendapat kode lewat migration. Kode tidak berubah saat status pesanan diubah.
+
+Cara mencoba:
+
+1. Buat pesanan lewat React (`http://localhost:5173`), lalu salin kode yang muncul pada pesan sukses.
+2. Klik **Cek Pesanan** di header React, masukkan kode tersebut (huruf kecil juga diterima), lalu
+   lihat konser, jenis tiket, jumlah, total, tanggal, dan status. Pesanan batal ditandai merah.
+3. Cek lewat API: `GET /api/pesanan/cek/{kode}`. Kode yang salah menghasilkan 404 dengan pesan
+   "Kode pesanan tidak ditemukan."
+4. `php artisan test` → 18 test lulus, termasuk pembuatan kode unik dan pencarian via API.
 
 ## Teknologi
 

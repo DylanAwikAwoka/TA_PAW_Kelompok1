@@ -10,6 +10,7 @@ use App\Models\Pesanan;
 use App\Models\TicketType;
 use App\Services\PesananService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 class PesananController extends Controller
 {
@@ -19,7 +20,20 @@ class PesananController extends Controller
 
     public function index()
     {
-        return PesananResource::collection(Pesanan::with('ticketType')->latest()->get());
+        return PesananResource::collection(Pesanan::with('konser', 'ticketType')->latest()->get());
+    }
+
+    public function cek(string $kode): PesananResource|JsonResponse
+    {
+        $pesanan = Pesanan::with('konser', 'ticketType')
+            ->where('kode_pesanan', Str::upper($kode))
+            ->first();
+
+        if (! $pesanan) {
+            return response()->json(['message' => 'Kode pesanan tidak ditemukan.'], 404);
+        }
+
+        return new PesananResource($pesanan);
     }
 
     public function bayar(Pesanan $pesanan): PesananResource|JsonResponse

@@ -11,7 +11,9 @@ class PesananResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'kode_pesanan' => $this->kode_pesanan,
             'konser_id' => $this->konser_id,
+            'konser' => $this->whenLoaded('konser', fn () => $this->konser->nama),
             'ticket_type_id' => $this->ticket_type_id,
             'nama_pemesan' => $this->nama_pemesan,
             'email' => $this->email,
