@@ -1,0 +1,162 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #f6f7fb;
+    color: #1f2430;
+}
+
+.topbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #1d2b53;
+    color: #fff;
+}
+
+.brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #fff;
+    text-decoration: none;
+}
+
+.topbar-note {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin: 0 0 16px;
+}
+
+h2 {
+    font-size: 1.125rem;
+    margin: 0 0 8px;
+}
+
+.grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.card,
+.detail,
+.form-pesanan {
+    background: #fff;
+    border: 1px solid #e2e5ee;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.detail,
+.form-pesanan {
+    margin-bottom: 16px;
+}
+
+.meta {
+    color: #5a6273;
+    font-size: 0.875rem;
+    margin: 0 0 8px;
+}
+
+.harga {
+    font-weight: 700;
+    margin: 0 0 8px;
+}
+
+.stok {
+    font-size: 0.875rem;
+    color: #1d7a46;
+    margin: 0 0 12px;
+}
+
+.stok-habis {
+    color: #b3261e;
+}
+
+.tombol {
+    display: inline-block;
+    background: #1d2b53;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.tombol:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tautan-kembali {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #1d2b53;
+}
+
+.state {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #e2e5ee;
+}
+
+.state-error {
+    border-color: #f2b8b5;
+    background: #fdeceb;
+    color: #b3261e;
+}
+
+.state-sukses {
+    border-color: #a8d5b5;
+    background: #eaf7ee;
+    color: #1d7a46;
+}
+
+form {
+    display: grid;
+    gap: 12px;
+    max-width: 420px;
+}
+
+label {
+    display: grid;
+    gap: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+input {
+    padding: 10px 12px;
+    border: 1px solid #c9cedb;
+    border-radius: 8px;
+    font: inherit;
+}
+
+@media (max-width: 480px) {
+    .topbar {
+        flex-direction: column;
+    }
+
+    h1 {
+        font-size: 1.25rem;
+    }
+}

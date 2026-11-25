@@ -82,6 +82,13 @@ class KonserController extends Controller
     public function destroy($id): RedirectResponse
     {
         $konser = Konser::findOrFail($id);
+
+        // Pesanan merujuk konser ini; tanpa pesan ini pengguna hanya melihat error 500 dari database.
+        if ($konser->pesanans()->exists()) {
+            return redirect()->route('konser.index')
+                ->with('error', 'Konser tidak dapat dihapus karena masih memiliki pesanan.');
+        }
+
         $konser->delete();
 
         return redirect()->route('konser.index')
