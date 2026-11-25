@@ -37,7 +37,7 @@ Keputusan yang diambil kelompok dan berlaku di aplikasi:
 | Kebijakan | Nilai | Keterangan |
 |---|---|---|
 | Batas pembelian per pesanan | 5 tiket | Diatur di `config/tiketwar.php` dan dipakai bersama oleh web dan API. |
-| Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. |
+| Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. Pesanan contoh tetap memakai data lama: Reguler dengan harga dasar konser. |
 | Stok konser | Total dari semua jenis | Kolom `sisa` pada konser hanya cerminan. Stok sebenarnya ada di masing-masing jenis tiket. |
 | Kode pesanan | 12 karakter acak huruf besar/angka | Dibuat otomatis saat pesanan dibuat, unik, dan dipakai untuk mengecek status. |
 
