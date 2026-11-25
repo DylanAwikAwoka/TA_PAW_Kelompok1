@@ -8,6 +8,7 @@ use App\Models\Pesanan;
 use App\Models\TicketType;
 use App\Services\PesananService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PesananController extends Controller
@@ -28,6 +29,29 @@ class PesananController extends Controller
         $daftarTipe = $konser->ticketTypes()->orderBy('nama')->get();
 
         return view('pesanan-create', compact('konser', 'daftarTipe'));
+    }
+
+    public function cek(Request $request): View
+    {
+        $kode = strtoupper(trim((string) $request->query('kode', '')));
+        $pesanan = null;
+        $galat = null;
+
+        if ($kode !== '') {
+            if (! preg_match('/^[A-Z0-9]{12}$/', $kode)) {
+                $galat = 'Kode pesanan harus 12 karakter huruf atau angka.';
+            } else {
+                $pesanan = Pesanan::with('konser', 'ticketType')
+                    ->where('kode_pesanan', $kode)
+                    ->first();
+
+                if (! $pesanan) {
+                    $galat = 'Kode pesanan tidak ditemukan.';
+                }
+            }
+        }
+
+        return view('pesanan-cek', compact('kode', 'pesanan', 'galat'));
     }
 
     public function store(PesananRequest $request, Konser $konser): RedirectResponse

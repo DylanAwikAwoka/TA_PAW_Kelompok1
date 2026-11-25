@@ -32,6 +32,7 @@ Route::get('/konser/{konser}/pesan', [PesananController::class, 'create'])
     ->whereNumber('konser')->name('pesanan.create');
 Route::post('/konser/{konser}/pesan', [PesananController::class, 'store'])
     ->whereNumber('konser')->name('pesanan.store');
+Route::get('/cek-pesanan', [PesananController::class, 'cek'])->name('pesanan.cek');
 
 // Login dan logout admin
 Route::get('/login', [AuthController::class, 'showLogin'])

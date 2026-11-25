@@ -47,6 +47,26 @@ class RiwayatPesananTest extends TestCase
             ->assertJsonPath('message', 'Kode pesanan tidak ditemukan.');
     }
 
+    public function test_halaman_blade_cek_menampilkan_detail_pesanan(): void
+    {
+        [$konser, $tipe] = $this->siapkanKonser();
+        $pesanan = $this->buatPesanan($konser, $tipe);
+
+        $this->get('/cek-pesanan?kode='.strtolower($pesanan->kode_pesanan))
+            ->assertOk()
+            ->assertSee('Cek Pesanan')
+            ->assertSee($pesanan->kode_pesanan)
+            ->assertSee('Konser Uji')
+            ->assertSee('VIP');
+    }
+
+    public function test_halaman_blade_cek_menampilkan_pesan_kode_salah(): void
+    {
+        $this->get('/cek-pesanan?kode=AAAAAAAAAAAA')
+            ->assertOk()
+            ->assertSee('Kode pesanan tidak ditemukan.');
+    }
+
     public function test_kode_tidak_berubah_saat_status_dibayar_atau_dibatalkan(): void
     {
         [$konser, $tipe] = $this->siapkanKonser();
