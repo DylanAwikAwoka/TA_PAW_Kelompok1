@@ -27,4 +27,9 @@ class Konser extends Model
     {
         return $this->hasMany(Pesanan::class);
     }
+
+    public function ticketTypes(): HasMany
+    {
+        return $this->hasMany(TicketType::class);
+    }
 }
