@@ -25,7 +25,7 @@ memakai API Laravel.
 ### Fitur pengembangan
 | Kode | Fitur | Status | Dikerjakan oleh |
 |---|---|---|---|
-| A | Kategori Tiket (VIP/Reguler, harga & stok per jenis) | Belum | [ISI] |
+| A | Kategori Tiket (VIP/Reguler, harga & stok per jenis) | Selesai | [ISI] |
 | I | Pembatasan Pembelian per pesanan | Belum | [ISI] |
 | G | Riwayat Pesanan lewat kode pesanan | Belum | [ISI] |
 | J | Log Aktivitas Admin | Belum (menunggu kepastian dosen) | [ISI] |
@@ -37,11 +37,36 @@ Keputusan yang diambil kelompok dan berlaku di aplikasi:
 | Kebijakan | Nilai | Keterangan |
 |---|---|---|
 | Batas pembelian per pesanan | 5 tiket | Diterapkan pada Fitur I; diatur di config, bukan angka di controller. |
-| Jenis tiket bawaan | VIP dan Reguler | Diterapkan pada Fitur A; dibuat seeder untuk setiap konser. |
+| Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. |
+| Stok konser | Total dari semua jenis | Kolom `sisa` pada konser hanya cerminan. Stok sebenarnya ada di masing-masing jenis tiket. |
 | Kode pesanan | 12 karakter acak | Diterapkan pada Fitur G; dipakai pelanggan untuk mengecek status pesanan. |
 
 Nilai di atas adalah rancangan yang disepakati kelompok. Setiap baris diperbarui saat fitur terkait
 selesai dikerjakan.
+
+## Fitur A — Kategori Tiket
+
+Satu konser dapat memiliki banyak jenis tiket. Setiap jenis punya nama, harga, dan stok sendiri.
+Saat memesan, harga satuan dan total selalu dihitung server dari jenis yang dipilih. Stok dicek dan
+dikurangi pada baris jenis tiket di dalam transaksi database dengan `lockForUpdate()`, sehingga dua
+pemesanan bersamaan tidak bisa membeli tiket yang sama. Membatalkan pesanan mengembalikan stok ke
+jenis yang sama. Konser tanpa jenis tiket tidak bisa dipesan, dan jenis yang sudah dipakai pesanan
+tidak bisa dihapus.
+
+Cara mencoba:
+
+1. Login admin, buka **Konser**, klik **Jenis Tiket** pada salah satu konser. Tambah/ubah jenis,
+   lalu perhatikan angka "Sisa" pada daftar konser = total sisa semua jenis.
+2. Buka `/konser/1/pesan`, pilih jenis tiket, isi nama/email/jumlah, kirim. Di `/pesanan` muncul
+   kolom **Jenis Tiket** dan total sesuai harga jenis tersebut.
+3. Coba kirim langsung lewat API:
+   `POST /api/konser/1/pesanan` dengan body
+   `{"nama_pemesan":"Budi","email":"budi@mail.test","jumlah":2,"ticket_type_id":1}`.
+   Menambahkan `harga_satuan`, `total`, atau `status` ke body tidak mengubah hasil.
+4. Kirim `jumlah` melebihi stok jenis → pesan "Sisa tiket VIP hanya …". Klik **Batal** pada pesanan
+   → stok jenis itu bertambah kembali, jenis lain tidak berubah.
+5. Coba hapus jenis yang sudah dipakai pesanan → pesan penolakan muncul.
+6. Di React (`http://localhost:5173`), buka detail konser, pilih jenis tiket di form pesan, kirim.
 
 ## Teknologi
 
