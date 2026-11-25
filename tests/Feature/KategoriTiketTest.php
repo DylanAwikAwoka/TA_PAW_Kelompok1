@@ -39,15 +39,16 @@ class KategoriTiketTest extends TestCase
     public function test_jumlah_melebihi_stok_jenis_ditolak_dengan_pesan_yang_jelas(): void
     {
         [$konser, $vip, $reguler] = $this->siapkanKonser();
+        $vip->update(['sisa' => 4]); // Jumlah uji tetap di bawah batas beli, jadi yang diuji stok.
 
         $this->post(route('pesanan.store', $konser), [
             'nama_pemesan' => 'Budi',
             'email' => 'budi@mail.test',
-            'jumlah' => 6,
+            'jumlah' => 5,
             'ticket_type_id' => $vip->id,
-        ])->assertSessionHasErrors(['jumlah' => 'Sisa tiket VIP hanya 5.']);
+        ])->assertSessionHasErrors(['jumlah' => 'Sisa tiket VIP hanya 4.']);
 
-        $this->assertSame(5, $vip->fresh()->sisa);
+        $this->assertSame(4, $vip->fresh()->sisa);
         $this->assertSame(10, $reguler->fresh()->sisa);
         $this->assertDatabaseCount('pesanans', 0);
     }

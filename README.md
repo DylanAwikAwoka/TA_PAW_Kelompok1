@@ -26,7 +26,7 @@ memakai API Laravel.
 | Kode | Fitur | Status | Dikerjakan oleh |
 |---|---|---|---|
 | A | Kategori Tiket (VIP/Reguler, harga & stok per jenis) | Selesai | [ISI] |
-| I | Pembatasan Pembelian per pesanan | Belum | [ISI] |
+| I | Pembatasan Pembelian per pesanan | Selesai | [ISI] |
 | G | Riwayat Pesanan lewat kode pesanan | Belum | [ISI] |
 | J | Log Aktivitas Admin | Belum (menunggu kepastian dosen) | [ISI] |
 
@@ -36,7 +36,7 @@ Keputusan yang diambil kelompok dan berlaku di aplikasi:
 
 | Kebijakan | Nilai | Keterangan |
 |---|---|---|
-| Batas pembelian per pesanan | 5 tiket | Diterapkan pada Fitur I; diatur di config, bukan angka di controller. |
+| Batas pembelian per pesanan | 5 tiket | Diatur di `config/tiketwar.php` dan dipakai bersama oleh web dan API. |
 | Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. |
 | Stok konser | Total dari semua jenis | Kolom `sisa` pada konser hanya cerminan. Stok sebenarnya ada di masing-masing jenis tiket. |
 | Kode pesanan | 12 karakter acak | Diterapkan pada Fitur G; dipakai pelanggan untuk mengecek status pesanan. |
@@ -67,6 +67,20 @@ Cara mencoba:
    → stok jenis itu bertambah kembali, jenis lain tidak berubah.
 5. Coba hapus jenis yang sudah dipakai pesanan → pesan penolakan muncul.
 6. Di React (`http://localhost:5173`), buka detail konser, pilih jenis tiket di form pesan, kirim.
+
+## Fitur I — Pembatasan Pembelian
+
+Satu pesanan maksimal **5 tiket**. Batas ini dibaca dari `config/tiketwar.php` dan diterapkan lewat
+satu `PesananRequest` yang dipakai rute web dan API, jadi tidak ada angka yang duplikat di controller.
+Jika jumlah melebihi batas, pesanan tidak dibuat dan stok tidak berubah.
+
+Cara mencoba:
+
+1. Buka `/konser/1/pesan`, isi jumlah **5** → pesanan dibuat. Ulangi dengan **6** → muncul
+   "Maksimal 5 tiket per pesanan." dan `/pesanan` tidak bertambah.
+2. Kirim `POST /api/konser/1/pesanan` dengan `jumlah: 6` → respons 422 berisi pesan yang sama.
+3. Di React, kirim `jumlah: 6` pada detail konser → pesan validasi tampil di halaman.
+4. `php artisan test` → 14 test lulus, termasuk uji batas web, API, dan perubahan nilai di config.
 
 ## Teknologi
 
