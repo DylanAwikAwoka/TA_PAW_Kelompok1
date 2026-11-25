@@ -66,7 +66,10 @@
         @error('jumlah')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
-        <div class="form-text">Harga satuan dan total dihitung server dari jenis tiket yang dipilih.</div>
+        <div class="form-text">
+            Maksimal {{ config('tiketwar.batas_pembelian_per_pesanan') }} tiket per pesanan.
+            Harga satuan dan total dihitung server dari jenis tiket yang dipilih.
+        </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Pesan Sekarang</button>

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PesananRequest;
 use App\Http\Resources\PesananResource;
 use App\Models\Konser;
 use App\Models\Pesanan;
 use App\Models\TicketType;
 use App\Services\PesananService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PesananController extends Controller
 {
@@ -45,14 +45,9 @@ class PesananController extends Controller
         return new PesananResource($pesanan->fresh('ticketType'));
     }
 
-    public function store(Request $request, Konser $konser): JsonResponse
+    public function store(PesananRequest $request, Konser $konser): JsonResponse
     {
-        $data = $request->validate([
-            'nama_pemesan' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100'],
-            'jumlah' => ['required', 'integer', 'min:1'],
-            'ticket_type_id' => ['required', 'exists:ticket_types,id'],
-        ]);
+        $data = $request->validated();
 
         $pesanan = $this->layanan->buat(
             $konser,
