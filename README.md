@@ -1,8 +1,9 @@
 # TiketWar — Tugas Akhir Pemrograman Aplikasi Web (Kelompok 1)
 
-Aplikasi penjualan tiket konser. Admin mengelola promotor, konser, pesanan, dan laporan penjualan
-lewat Laravel (Blade). Pelanggan melihat daftar konser dan memesan tiket lewat aplikasi React yang
-memakai API Laravel.
+Aplikasi penjualan tiket konser. Tampilan memakai Blade dari repo `GD6_12776` (UI lama) dengan
+penambahan fitur A, I, dan G. Admin mengelola promotor, konser, pesanan, dan laporan penjualan;
+pelanggan melihat daftar konser, memesan tiket, dan mengecek status pesanan lewat halaman Blade.
+API Laravel tetap tersedia.
 
 ## Anggota Kelompok
 
@@ -37,7 +38,7 @@ Keputusan yang diambil kelompok dan berlaku di aplikasi:
 | Kebijakan | Nilai | Keterangan |
 |---|---|---|
 | Batas pembelian per pesanan | 5 tiket | Diatur di `config/tiketwar.php` dan dipakai bersama oleh web dan API. |
-| Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. |
+| Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser. Harga VIP = 1,5 × harga reguler (dibulatkan). Stok VIP maksimal 5 tiket atau 20% stok konser, mana yang lebih kecil. Pesanan contoh tetap memakai data lama: Reguler dengan harga dasar konser. |
 | Stok konser | Total dari semua jenis | Kolom `sisa` pada konser hanya cerminan. Stok sebenarnya ada di masing-masing jenis tiket. |
 | Kode pesanan | 12 karakter acak huruf besar/angka | Dibuat otomatis saat pesanan dibuat, unik, dan dipakai untuk mengecek status. |
 
@@ -66,7 +67,7 @@ Cara mencoba:
 4. Kirim `jumlah` melebihi stok jenis → pesan "Sisa tiket VIP hanya …". Klik **Batal** pada pesanan
    → stok jenis itu bertambah kembali, jenis lain tidak berubah.
 5. Coba hapus jenis yang sudah dipakai pesanan → pesan penolakan muncul.
-6. Di React (`http://localhost:5173`), buka detail konser, pilih jenis tiket di form pesan, kirim.
+6. Pada form `/konser/1/pesan`, pilih jenis tiket di halaman Blade yang sama seperti UI lama, kirim.
 
 ## Fitur I — Pembatasan Pembelian
 
@@ -79,43 +80,41 @@ Cara mencoba:
 1. Buka `/konser/1/pesan`, isi jumlah **5** → pesanan dibuat. Ulangi dengan **6** → muncul
    "Maksimal 5 tiket per pesanan." dan `/pesanan` tidak bertambah.
 2. Kirim `POST /api/konser/1/pesanan` dengan `jumlah: 6` → respons 422 berisi pesan yang sama.
-3. Di React, kirim `jumlah: 6` pada detail konser → pesan validasi tampil di halaman.
-4. `php artisan test` → 14 test lulus, termasuk uji batas web, API, dan perubahan nilai di config.
+3. `php artisan test` → uji batas web, API, dan perubahan nilai di config ikut dijalankan.
 
 ## Fitur G — Riwayat Pesanan
 
-Setiap pesanan mendapat kode 12 karakter (huruf besar dan angka) secara otomatis. Kode tampil pada
-pesan sukses React dan kolom **Kode Pesanan** di halaman admin `/pesanan`. Data pesanan lama
-mendapat kode lewat migration. Kode tidak berubah saat status pesanan diubah.
+Setiap pesanan mendapat kode 12 karakter (huruf besar dan angka) secara otomatis. Kode tampil di
+kolom **Kode Pesanan** pada halaman admin `/pesanan` dan bisa dipakai pelanggan di halaman
+**Cek Pesanan** (Blade, mengikuti UI lama). Data pesanan lama mendapat kode lewat migration. Kode
+tidak berubah saat status pesanan diubah.
 
 Cara mencoba:
 
-1. Buat pesanan lewat React (`http://localhost:5173`), lalu salin kode yang muncul pada pesan sukses.
-2. Klik **Cek Pesanan** di header React, masukkan kode tersebut (huruf kecil juga diterima), lalu
-   lihat konser, jenis tiket, jumlah, total, tanggal, dan status. Pesanan batal ditandai merah.
+1. Buat pesanan lewat `/konser/1/pesan`, lalu lihat kode di kolom **Kode Pesanan** pada `/pesanan`.
+2. Klik **Cek Pesanan** di navbar, masukkan kode tersebut (huruf kecil juga diterima), lalu lihat
+   konser, jenis tiket, jumlah, total, tanggal, dan status.
 3. Cek lewat API: `GET /api/pesanan/cek/{kode}`. Kode yang salah menghasilkan 404 dengan pesan
    "Kode pesanan tidak ditemukan."
-4. `php artisan test` → 18 test lulus, termasuk pembuatan kode unik dan pencarian via API.
 
 ## Teknologi
 
-- Laravel 13 + PHP 8.3 (MySQL, Blade, Sanctum, DomPDF)
-- React 19 + Vite (folder `react/`)
+- Laravel 13 + PHP 8.3 (MySQL, Blade, Bootstrap CDN, Sanctum, DomPDF)
+- Tampilan mengikuti repo `GD6_12776`; tidak memakai Node.js/Vite
 
 ## Struktur Folder
 
 ```
 app/                 kode Laravel (controller, model, resource)
 database/            migration dan seeder
-resources/views/     tampilan Blade untuk admin dan pelanggan
+resources/views/     tampilan Blade untuk admin dan pelanggan (UI lama GD6_12776)
 routes/              web.php (Blade) dan api.php (API)
-react/               aplikasi React untuk pelanggan
 docs/                catatan praktikum dan jawaban latihan modul
 ```
 
 ## Cara Menjalankan
 
-Prasyarat: PHP 8.3+, Composer, Node.js 20+, MySQL (XAMPP) menyala.
+Prasyarat: PHP 8.3+, Composer, MySQL (XAMPP) menyala. Tidak perlu Node.js.
 
 1. Nyalakan **MySQL** di XAMPP, lalu buat database `tiketwar` (mis. lewat phpMyAdmin).
 2. Pasang dependensi PHP:
@@ -139,14 +138,7 @@ Prasyarat: PHP 8.3+, Composer, Node.js 20+, MySQL (XAMPP) menyala.
    ```
    php artisan serve
    ```
-   Aplikasi Blade: <http://127.0.0.1:8000>
-7. Jalankan aplikasi React (terminal terpisah):
-   ```
-   cd react
-   npm install
-   npm run dev
-   ```
-   Aplikasi React: <http://localhost:5173> (permintaan `/api` diteruskan ke Laravel oleh Vite).
+   Aplikasi Blade: <http://127.0.0.1:8000>. Tidak perlu server lain.
 
 ### Database untuk pengujian
 

@@ -14,8 +14,6 @@
 /.zed
 /auth.json
 /node_modules
-/react/node_modules
-/react/dist
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

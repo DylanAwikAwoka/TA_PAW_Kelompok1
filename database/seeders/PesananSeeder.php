@@ -10,7 +10,8 @@ class PesananSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->buat('Coldplay - Music of the Spheres', 'VIP', 'Budi Santoso', 'budi@mail.test', 2, Pesanan::LUNAS, 6);
+        // Data contoh lama memakai harga dasar konser, jadi jenisnya Reguler.
+        $this->buat('Coldplay - Music of the Spheres', 'Reguler', 'Budi Santoso', 'budi@mail.test', 2, Pesanan::LUNAS, 6);
         $this->buat('Dewa 19 - Pesta Rakyat', 'Reguler', 'Rina Wijaya', 'rina@mail.test', 4, Pesanan::LUNAS, 5);
         $this->buat('Festival Musik Pantai', 'Reguler', 'Agus Pratama', 'agus@mail.test', 2, Pesanan::BATAL, 4);
         $this->buat('Coldplay - Music of the Spheres', 'Reguler', 'Siti Aminah', 'siti@mail.test', 1, Pesanan::MENUNGGU_BAYAR, 3);
