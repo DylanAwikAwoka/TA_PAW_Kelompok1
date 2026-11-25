@@ -36,9 +36,12 @@ Keputusan yang diambil kelompok dan berlaku di aplikasi:
 
 | Kebijakan | Nilai | Keterangan |
 |---|---|---|
-| Batas pembelian per pesanan | 5 tiket | Diatur di `config/tiketwar.php`, dapat diubah lewat `BATAS_TIKET` pada `.env`. |
-| Jenis tiket bawaan | VIP dan Reguler | Dibuat seeder untuk setiap konser; admin dapat menambah/mengubah. |
-| Kode pesanan | 12 karakter acak | Dipakai pelanggan untuk mengecek status pesanan. |
+| Batas pembelian per pesanan | 5 tiket | Diterapkan pada Fitur I; diatur di config, bukan angka di controller. |
+| Jenis tiket bawaan | VIP dan Reguler | Diterapkan pada Fitur A; dibuat seeder untuk setiap konser. |
+| Kode pesanan | 12 karakter acak | Diterapkan pada Fitur G; dipakai pelanggan untuk mengecek status pesanan. |
+
+Nilai di atas adalah rancangan yang disepakati kelompok. Setiap baris diperbarui saat fitur terkait
+selesai dikerjakan.
 
 ## Teknologi
 
@@ -89,7 +92,7 @@ Prasyarat: PHP 8.3+, Composer, Node.js 20+, MySQL (XAMPP) menyala.
    npm install
    npm run dev
    ```
-   Aplikasi React: <http://127.0.0.1:5173> (permintaan `/api` diteruskan ke Laravel oleh Vite).
+   Aplikasi React: <http://localhost:5173> (permintaan `/api` diteruskan ke Laravel oleh Vite).
 
 ### Database untuk pengujian
 
