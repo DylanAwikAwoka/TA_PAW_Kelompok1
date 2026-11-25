@@ -6,6 +6,7 @@ use App\Http\Controllers\KonserController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\PromotorController;
+use App\Http\Controllers\TicketTypeController;
 use App\Models\Konser;
 use App\Models\Promotor;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,16 @@ Route::middleware('auth')->group(function () {
         ->whereNumber('id')->name('promotor.update');
     Route::delete('/promotor/{id}', [PromotorController::class, 'destroy'])
         ->whereNumber('id')->name('promotor.destroy');
+
+    // Kelola jenis tiket
+    Route::get('/konser/{konser}/jenis', [TicketTypeController::class, 'index'])
+        ->name('jenis-tiket.index');
+    Route::post('/konser/{konser}/jenis', [TicketTypeController::class, 'store'])
+        ->name('jenis-tiket.store');
+    Route::put('/jenis-tiket/{ticketType}', [TicketTypeController::class, 'update'])
+        ->name('jenis-tiket.update');
+    Route::delete('/jenis-tiket/{ticketType}', [TicketTypeController::class, 'destroy'])
+        ->name('jenis-tiket.destroy');
 
     // Kelola pesanan
     Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan.index');

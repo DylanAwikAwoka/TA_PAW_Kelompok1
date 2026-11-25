@@ -14,7 +14,7 @@ class KonserController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $daftarKonser = Konser::with('promotor')
+        $daftarKonser = Konser::with('promotor', 'ticketTypes')
             ->when($request->query('kota'), fn ($query, $kota) => $query->where('kota', $kota))
             ->orderBy('tanggal')
             ->get();
@@ -24,12 +24,14 @@ class KonserController extends Controller
 
     public function show(Konser $konser): KonserResource
     {
-        return new KonserResource($konser->load('promotor'));
+        return new KonserResource($konser->load('promotor', 'ticketTypes'));
     }
 
     public function store(Request $request): JsonResponse
     {
-        $konser = Konser::create($request->validate($this->aturan()));
+        $data = $request->validate($this->aturan());
+        $data['sisa'] = 0;
+        $konser = Konser::create($data);
 
         return (new KonserResource($konser))->response()->setStatusCode(201);
     }
@@ -61,7 +63,6 @@ class KonserController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'kota' => ['required', 'string', 'max:100'],
             'harga' => ['required', 'integer', 'min:0'],
-            'sisa' => ['required', 'integer', 'min:0'],
             'tanggal' => ['required', 'date'],
             'deskripsi' => ['nullable', 'string'],
         ];

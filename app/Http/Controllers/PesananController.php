@@ -4,24 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Konser;
 use App\Models\Pesanan;
+use App\Models\TicketType;
+use App\Services\PesananService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PesananController extends Controller
 {
+    public function __construct(private PesananService $layanan)
+    {
+    }
+
     public function index(): View
     {
-        $daftarPesanan = Pesanan::with('konser')->latest()->get();
+        $daftarPesanan = Pesanan::with('konser', 'ticketType')->latest()->get();
 
         return view('pesanan', compact('daftarPesanan'));
     }
 
     public function create(Konser $konser): View
     {
-        return view('pesanan-create', compact('konser'));
+        $daftarTipe = $konser->ticketTypes()->orderBy('nama')->get();
+
+        return view('pesanan-create', compact('konser', 'daftarTipe'));
     }
 
     public function store(Request $request, Konser $konser): RedirectResponse
@@ -30,31 +36,14 @@ class PesananController extends Controller
             'nama_pemesan' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:100'],
             'jumlah' => ['required', 'integer', 'min:1'],
+            'ticket_type_id' => ['required', 'exists:ticket_types,id'],
         ]);
 
-        DB::transaction(function () use ($konser, $data) {
-            // Baca ulang konser sambil mengunci barisnya (sisa harus yang terbaru).
-            $terkunci = Konser::lockForUpdate()->findOrFail($konser->id);
-
-            if ($data['jumlah'] > $terkunci->sisa) {
-                throw ValidationException::withMessages([
-                    'jumlah' => 'Sisa tiket hanya ' . $terkunci->sisa . '.',
-                ]);
-            }
-
-            // Harga dan total selalu dihitung server, bukan diambil dari form.
-            Pesanan::create([
-                'konser_id' => $terkunci->id,
-                'nama_pemesan' => $data['nama_pemesan'],
-                'email' => $data['email'],
-                'jumlah' => $data['jumlah'],
-                'harga_satuan' => $terkunci->harga,
-                'total' => $terkunci->harga * $data['jumlah'],
-                'status' => Pesanan::MENUNGGU_BAYAR,
-            ]);
-
-            $terkunci->decrement('sisa', $data['jumlah']);
-        });
+        $this->layanan->buat(
+            $konser,
+            TicketType::findOrFail($data['ticket_type_id']),
+            $data
+        );
 
         return redirect()->route('pesanan.index')
             ->with('success', 'Pesanan berhasil dibuat. Status: menunggu bayar.');
@@ -62,19 +51,7 @@ class PesananController extends Controller
 
     public function bayar(Pesanan $pesanan): RedirectResponse
     {
-        $berhasil = DB::transaction(function () use ($pesanan) {
-            $terkunci = Pesanan::lockForUpdate()->findOrFail($pesanan->id);
-
-            if ($terkunci->status !== Pesanan::MENUNGGU_BAYAR) {
-                return false;
-            }
-
-            $terkunci->update(['status' => Pesanan::LUNAS]);
-
-            return true;
-        });
-
-        if (! $berhasil) {
+        if (! $this->layanan->bayar($pesanan)) {
             return redirect()->route('pesanan.index')
                 ->with('error', 'Hanya pesanan menunggu bayar yang bisa dibayar.');
         }
@@ -85,23 +62,7 @@ class PesananController extends Controller
 
     public function batal(Pesanan $pesanan): RedirectResponse
     {
-        $berhasil = DB::transaction(function () use ($pesanan) {
-            $terkunci = Pesanan::lockForUpdate()->findOrFail($pesanan->id);
-
-            if ($terkunci->status !== Pesanan::MENUNGGU_BAYAR) {
-                return false;
-            }
-
-            // Stok dikembalikan dan status diubah dalam satu transaksi.
-            Konser::lockForUpdate()->findOrFail($terkunci->konser_id)
-                ->increment('sisa', $terkunci->jumlah);
-
-            $terkunci->update(['status' => Pesanan::BATAL]);
-
-            return true;
-        });
-
-        if (! $berhasil) {
+        if (! $this->layanan->batal($pesanan)) {
             return redirect()->route('pesanan.index')
                 ->with('error', 'Hanya pesanan menunggu bayar yang bisa dibatalkan.');
         }
