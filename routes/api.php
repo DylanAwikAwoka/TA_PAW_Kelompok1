@@ -18,6 +18,8 @@ Route::get('/konser/{konser}', [KonserController::class, 'show'])
     ->whereNumber('konser')->name('api.konser.show');
 Route::post('/konser/{konser}/pesanan', [PesananController::class, 'store'])
     ->whereNumber('konser')->name('api.pesanan.store');
+Route::get('/pesanan/cek/{kode}', [PesananController::class, 'cek'])
+    ->where('kode', '[A-Za-z0-9]{12}')->name('api.pesanan.cek');
 
 // Token admin (Tugas Rumah: Sanctum dan Audit Keamanan)
 Route::post('/login', [TokenController::class, 'store'])
