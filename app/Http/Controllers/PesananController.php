@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PesananRequest;
 use App\Models\Konser;
 use App\Models\Pesanan;
 use App\Models\TicketType;
 use App\Services\PesananService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PesananController extends Controller
@@ -30,14 +30,9 @@ class PesananController extends Controller
         return view('pesanan-create', compact('konser', 'daftarTipe'));
     }
 
-    public function store(Request $request, Konser $konser): RedirectResponse
+    public function store(PesananRequest $request, Konser $konser): RedirectResponse
     {
-        $data = $request->validate([
-            'nama_pemesan' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100'],
-            'jumlah' => ['required', 'integer', 'min:1'],
-            'ticket_type_id' => ['required', 'exists:ticket_types,id'],
-        ]);
+        $data = $request->validated();
 
         $this->layanan->buat(
             $konser,
