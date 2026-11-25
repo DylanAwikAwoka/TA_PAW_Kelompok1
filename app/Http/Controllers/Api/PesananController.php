@@ -6,52 +6,43 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PesananResource;
 use App\Models\Konser;
 use App\Models\Pesanan;
+use App\Models\TicketType;
+use App\Services\PesananService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class PesananController extends Controller
 {
+    public function __construct(private PesananService $layanan)
+    {
+    }
+
     public function index()
     {
-        return PesananResource::collection(Pesanan::latest()->get());
+        return PesananResource::collection(Pesanan::with('ticketType')->latest()->get());
     }
 
     public function bayar(Pesanan $pesanan): PesananResource|JsonResponse
     {
-        return DB::transaction(function () use ($pesanan) {
-            $terkunci = Pesanan::lockForUpdate()->findOrFail($pesanan->id);
+        if (! $this->layanan->bayar($pesanan)) {
+            return response()->json([
+                'message' => 'Hanya pesanan berstatus menunggu_bayar yang bisa dibayar.',
+            ], 409);
+        }
 
-            if ($terkunci->status !== Pesanan::MENUNGGU_BAYAR) {
-                return response()->json([
-                    'message' => 'Hanya pesanan berstatus menunggu_bayar yang bisa dibayar.',
-                ], 409);
-            }
-
-            $terkunci->update(['status' => Pesanan::LUNAS]);
-
-            return new PesananResource($terkunci);
-        });
+        // Service memakai instance lain, jadi baca ulang agar status di respons tidak basi.
+        return new PesananResource($pesanan->fresh('ticketType'));
     }
 
     public function batal(Pesanan $pesanan): PesananResource|JsonResponse
     {
-        return DB::transaction(function () use ($pesanan) {
-            $terkunci = Pesanan::lockForUpdate()->findOrFail($pesanan->id);
+        if (! $this->layanan->batal($pesanan)) {
+            return response()->json([
+                'message' => 'Hanya pesanan berstatus menunggu_bayar yang bisa dibatalkan.',
+            ], 409);
+        }
 
-            if ($terkunci->status !== Pesanan::MENUNGGU_BAYAR) {
-                return response()->json([
-                    'message' => 'Hanya pesanan berstatus menunggu_bayar yang bisa dibatalkan.',
-                ], 409);
-            }
-
-            $konser = Konser::lockForUpdate()->findOrFail($terkunci->konser_id);
-            $konser->increment('sisa', $terkunci->jumlah);
-            $terkunci->update(['status' => Pesanan::BATAL]);
-
-            return new PesananResource($terkunci);
-        });
+        return new PesananResource($pesanan->fresh('ticketType'));
     }
 
     public function store(Request $request, Konser $konser): JsonResponse
@@ -60,35 +51,16 @@ class PesananController extends Controller
             'nama_pemesan' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:100'],
             'jumlah' => ['required', 'integer', 'min:1'],
+            'ticket_type_id' => ['required', 'exists:ticket_types,id'],
         ]);
 
-        $pesanan = DB::transaction(function () use ($konser, $data) {
-            // Baca ulang konser sambil mengunci barisnya (sisa harus yang terbaru).
-            $terkunci = Konser::lockForUpdate()->findOrFail($konser->id);
+        $pesanan = $this->layanan->buat(
+            $konser,
+            TicketType::findOrFail($data['ticket_type_id']),
+            $data
+        );
 
-            if ($data['jumlah'] > $terkunci->sisa) {
-                throw ValidationException::withMessages([
-                    'jumlah' => 'Sisa tiket hanya ' . $terkunci->sisa . '.',
-                ]);
-            }
-
-            // Harga dan total selalu dihitung server, bukan diambil dari body.
-            $pesanan = Pesanan::create([
-                'konser_id' => $terkunci->id,
-                'nama_pemesan' => $data['nama_pemesan'],
-                'email' => $data['email'],
-                'jumlah' => $data['jumlah'],
-                'harga_satuan' => $terkunci->harga,
-                'total' => $terkunci->harga * $data['jumlah'],
-                'status' => Pesanan::MENUNGGU_BAYAR,
-            ]);
-
-            $terkunci->decrement('sisa', $data['jumlah']);
-
-            return $pesanan;
-        });
-
-        return (new PesananResource($pesanan))
+        return (new PesananResource($pesanan->load('ticketType')))
             ->response()
             ->setStatusCode(201);
     }

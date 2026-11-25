@@ -46,13 +46,8 @@
         @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="sisa" class="form-label">Sisa Tiket</label>
-        <input type="number" min="0" name="sisa" id="sisa"
-               class="form-control @error('sisa') is-invalid @enderror"
-               value="{{ old('sisa', $konser->sisa ?? '') }}">
-        @error('sisa')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
+        <label class="form-label">Sisa Tiket</label>
+        <div class="form-text">Stok diatur pada menu Jenis Tiket setelah konser disimpan.</div>
     </div>
     <div class="col-md-4 mb-3">
         <label for="tanggal" class="form-label">Tanggal</label>

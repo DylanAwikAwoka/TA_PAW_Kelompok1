@@ -41,7 +41,7 @@ class LaporanController extends Controller
     // Satu sumber filter untuk dashboard, PDF, dan (nanti) CSV.
     private function pesananTerfilter(Request $request): Builder
     {
-        return Pesanan::with('konser')
+        return Pesanan::with('konser', 'ticketType')
             ->when($request->query('status'), function ($query, $status) {
                 $query->where('status', $status);
             })

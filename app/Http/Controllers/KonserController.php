@@ -24,7 +24,7 @@ class KonserController extends Controller
 
     public function show($id): View
     {
-        $konser = Konser::with('promotor')->findOrFail($id);
+        $konser = Konser::with('promotor', 'ticketTypes')->findOrFail($id);
         return view('konser-detail', compact('konser'));
     }
 
@@ -41,11 +41,12 @@ class KonserController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'kota' => ['required', 'string', 'max:100'],
             'harga' => ['required', 'integer', 'min:0'],
-            'sisa' => ['required', 'integer', 'min:0'],
             'tanggal' => ['required', 'date'],
             'deskripsi' => ['nullable', 'string'],
         ]);
 
+        // Stok kini diisi lewat jenis tiket, bukan langsung pada konser.
+        $data['sisa'] = 0;
         Konser::create($data);
 
         return redirect()->route('konser.index')
@@ -68,7 +69,6 @@ class KonserController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'kota' => ['required', 'string', 'max:100'],
             'harga' => ['required', 'integer', 'min:0'],
-            'sisa' => ['required', 'integer', 'min:0'],
             'tanggal' => ['required', 'date'],
             'deskripsi' => ['nullable', 'string'],
         ]);

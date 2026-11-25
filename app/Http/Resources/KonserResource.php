@@ -17,6 +17,13 @@ class KonserResource extends JsonResource
             'sisa' => $this->sisa,
             'tanggal' => $this->tanggal,
             'promotor' => $this->whenLoaded('promotor', fn () => $this->promotor->nama),
+            'ticket_types' => $this->whenLoaded('ticketTypes', fn () => $this->ticketTypes
+                ->map(fn ($tipe) => [
+                    'id' => $tipe->id,
+                    'nama' => $tipe->nama,
+                    'harga' => $tipe->harga,
+                    'sisa' => $tipe->sisa,
+                ])->values()->all()),
         ];
     }
 }

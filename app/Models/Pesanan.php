@@ -13,6 +13,7 @@ class Pesanan extends Model
 
     protected $fillable = [
         'konser_id',
+        'ticket_type_id',
         'nama_pemesan',
         'email',
         'jumlah',
@@ -24,5 +25,10 @@ class Pesanan extends Model
     public function konser(): BelongsTo
     {
         return $this->belongsTo(Konser::class);
+    }
+
+    public function ticketType(): BelongsTo
+    {
+        return $this->belongsTo(TicketType::class);
     }
 }
