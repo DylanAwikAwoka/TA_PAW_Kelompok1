@@ -59,6 +59,8 @@
                 <a href="{{ route('konser.detail', ['id' => $konser->id]) }}"
                    class="btn btn-sm btn-primary">Detail</a>
                 @auth
+                    <a href="{{ route('jenis-tiket.index', $konser) }}"
+                       class="btn btn-sm btn-info">Jenis Tiket</a>
                     <a href="{{ route('konser.edit', ['id' => $konser->id]) }}"
                        class="btn btn-sm btn-warning">Edit</a>
                     <form action="{{ route('konser.destroy', ['id' => $konser->id]) }}"

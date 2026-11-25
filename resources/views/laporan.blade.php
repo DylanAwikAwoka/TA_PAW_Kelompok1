@@ -68,6 +68,7 @@
         <th>Tanggal</th>
         <th>Pemesan</th>
         <th>Konser</th>
+        <th>Jenis Tiket</th>
         <th>Jumlah</th>
         <th>Total</th>
         <th>Status</th>
@@ -80,6 +81,7 @@
             <td>{{ $pesanan->created_at->format('d-m-Y H:i') }}</td>
             <td>{{ $pesanan->nama_pemesan }}</td>
             <td>{{ $pesanan->konser->nama }}</td>
+            <td>{{ $pesanan->ticketType->nama ?? '-' }}</td>
             <td>{{ $pesanan->jumlah }}</td>
             <td>Rp{{ number_format($pesanan->total, 0, ',', '.') }}</td>
             <td>
@@ -88,7 +90,7 @@
         </tr>
     @empty
         <tr>
-            <td colspan="7" class="text-center">Tidak ada pesanan yang cocok.</td>
+            <td colspan="8" class="text-center">Tidak ada pesanan yang cocok.</td>
         </tr>
     @endforelse
     </tbody>

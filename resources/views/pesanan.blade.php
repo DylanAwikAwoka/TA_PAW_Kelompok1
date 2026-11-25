@@ -12,6 +12,7 @@
             <th>Tanggal</th>
             <th>Pemesan</th>
             <th>Konser</th>
+            <th>Jenis Tiket</th>
             <th>Jumlah</th>
             <th>Total</th>
             <th>Status</th>
@@ -26,6 +27,7 @@
                 <td>{{ $pesanan->nama_pemesan }}<br>
                     <small class="text-muted">{{ $pesanan->email }}</small></td>
                 <td>{{ $pesanan->konser->nama }}</td>
+                <td>{{ $pesanan->ticketType->nama ?? '-' }}</td>
                 <td>{{ $pesanan->jumlah }}</td>
                 <td>Rp{{ number_format($pesanan->total, 0, ',', '.') }}</td>
                 <td>
@@ -55,7 +57,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="8" class="text-center">Belum ada pesanan.</td>
+                <td colspan="9" class="text-center">Belum ada pesanan.</td>
             </tr>
         @endforelse
     </tbody>
